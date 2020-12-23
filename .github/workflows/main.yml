@@ -9,8 +9,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        projectPath:
+          - path/to/your/project
         unityVersion:
-          - 2020.1.2f1
+          - 2019.2.11f1
         testMode:
           - playmode
           - editmode
@@ -25,11 +27,12 @@ jobs:
           restore-keys: |
             Library-
       - uses: webbertakken/unity-test-runner@v1.4
-        env:
-          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-          UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
         id: tests
+        with:
+          projectPath: ${{ matrix.projectPath }}
+          unityVersion: ${{ matrix.unityVersion }}
+          testMode: ${{ matrix.testMode }}
+          artifactsPath: ${{ matrix.testMode }}-artifacts
       - uses: actions/upload-artifact@v1
         with:
           name: Test results for ${{ matrix.testMode }}
