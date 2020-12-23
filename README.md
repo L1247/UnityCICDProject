@@ -1,4 +1,4 @@
 UnityCICDProject
 
-![Tester](https://github.com/L1247/UnityCICDProject/GithubActionTest/workflows/Main/badge.svg?branch=develop)
-![Builder](https://github.com/L1247/UnityCICDProject/GithubActionTest/workflows/Main/badge.svg?branch=develop)
+![Tester](https://img.shields.io/github/workflow/status/L1247/UnityCICDProject/Build?style=plastic)
+![Builder](https://img.shields.io/github/workflow/status/L1247/UnityCICDProject/Build?style=plastic)
