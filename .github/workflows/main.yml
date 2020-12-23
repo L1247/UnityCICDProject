@@ -33,21 +33,6 @@ jobs:
             Library-
             Library-
 
-
-      # TestRun
-      - uses: webbertakken/unity-test-runner@v1.3
-        id: testRunner
-        with:
-          customParameters: '-nographics' 
-          unityVersion: ${{ matrix.unityVersion }}
-
-      - uses: actions/upload-artifact@v1
-        with:
-          name: Test results (all modes)
-          path: ${{ steps.testRunner.outputs.artifactsPath }}
-
-
-
       # Build&Upload
       - uses: webbertakken/unity-builder@v0.10
         with:
