@@ -1,43 +1,59 @@
-name: Test Action
+name: Build
 
 on: [push]
 
+env:
+  UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+  UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+  UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
 jobs:
-  testAllModes:
-    name: Test in ${{ matrix.testMode }} on version ${{ matrix.unityVersion }}
+  buildAndTestForSomePlatforms:
+    name: Build for ${{ matrix.targetPlatform }} on version ${{ matrix.unityVersion }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         projectPath:
-          - path/to/your/project
+          - test-project
         unityVersion:
-          - 2019.2.11f1
-        testMode:
-          - playmode
-          - editmode
+          - 2020.1.2f1
+        targetPlatform:
+          - StandaloneWindows64 # Build a Windows 64-bit standalone.
+
+    # Checkout&Cache
     steps:
       - uses: actions/checkout@v2
         with:
           lfs: true
       - uses: actions/cache@v1.1.0
         with:
-          path: ${{ matrix.projectPath }}/Library
-          key: Library-${{ matrix.projectPath }}
+          path: Library
+          key: Library-${{ matrix.targetPlatform }}
           restore-keys: |
             Library-
-      - uses: webbertakken/unity-test-runner@v1.4
-        env:
-          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-          UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
-        id: tests
+            Library-
+
+
+      # TestRun
+      - uses: webbertakken/unity-test-runner@v1.3
+        id: testRunner
         with:
-          projectPath: ${{ matrix.projectPath }}
+          customParameters: '-nographics' # <--- This is the important bit: 
           unityVersion: ${{ matrix.unityVersion }}
-          testMode: ${{ matrix.testMode }}
-          artifactsPath: ${{ matrix.testMode }}-artifacts
+
       - uses: actions/upload-artifact@v1
         with:
-          name: Test results for ${{ matrix.testMode }}
-          path: ${{ steps.tests.outputs.artifactsPath }}
+          name: Test results (all modes)
+          path: ${{ steps.testRunner.outputs.artifactsPath }}
+
+
+
+      # Build&Upload
+      - uses: webbertakken/unity-builder@v0.10
+        with:
+          unityVersion: ${{ matrix.unityVersion }}
+          targetPlatform: ${{ matrix.targetPlatform }}
+      - uses: actions/upload-artifact@v1
+        with:
+          name: Build
+          path: build
